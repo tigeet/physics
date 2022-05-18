@@ -167,24 +167,28 @@ class Object:
         return self
 
 
-def draw_graphics():
-    cl = Object().go_up().go_up().go_down(2)
-
-    plt.title("Высота")
+def draw_graphics(cl):
+    plt.title("Height")
     plt.plot(cl.array_t, cl.array_h)
-    plt.savefig(r'res/height.png')
+    plt.xlabel('Time, sec')
+    plt.ylabel('Height, meters')
+    plt.savefig(r'height.png')
     # plt.show()
     plt.close()
 
-    plt.title("Скорость")
+    plt.title("Velocity")
     plt.plot(cl.array_t, cl.array_v)
-    plt.savefig(r'res/velocity.png')
+    plt.xlabel('Time, sec')
+    plt.ylabel('Velocity, meters/second')
+    plt.savefig(r'velocity.png')
     # plt.show()
     plt.close()
 
-    plt.title("#" + "Ускро")
+    plt.title("Acceleration")
     plt.plot(cl.array_t, cl.array_a)
-    plt.savefig(r'res/acceleration.png')
+    plt.xlabel('Time, sec')
+    plt.ylabel('Acceleration, meters/second^2')
+    plt.savefig(r'acceleration.png')
     # plt.show()
     plt.close()
 
@@ -222,16 +226,11 @@ def arrowedLine(draw, ptA, ptB, width=1, color=(0, 255, 0)):
         vtx0 = (xb + a, yb + b)
         vtx1 = (xb - a, yb - b)
 
-    # draw.point((xb,yb), fill=(255,0,0))    # DEBUG: draw point of base in red - comment out draw.polygon() below if using this line
-    # im.save('DEBUG-base.png')              # DEBUG: save
-
-    # Now draw the arrowhead triangle
     draw.polygon([vtx0, vtx1, ptB], fill=color)
     return draw
 
 
-def draw_anim():
-    obj = Object().go_up().go_up().go_down(2)
+def draw_anim(obj):
     m_to_px = 40
     width = 1000
     height = 1000
@@ -247,11 +246,6 @@ def draw_anim():
     lift_height = obj.distance * m_to_px
     person_width = lift_width / 1.7
     person_height = lift_height / 1.7
-    try:
-        font = ImageFont.truetype('GoogleSans-Regular.ttf', 32)
-    except OSError:
-        print('add a font with utf-8 support to the project directory')
-        return
 
     for i in range(len(obj.array_t)):
         x = width // 2
@@ -291,59 +285,66 @@ def draw_anim():
             draw,
             (x, y),
             (x, y + obj.weight * obj.g / mult),
-            color=color_4
+            color=color_4,
         )
+
+
 
         draw.text(  # модуль силы реакции опоры
             (x + 32, y - obj.array_w[i] / (mult * 2)),
-            'N = {weight: .2f} Н'.format(weight=obj.array_w[i]),
+            'N = {weight: .2f} H'.format(weight=obj.array_w[i]),
             fill=color_3,
-            font=font
+            fontsize=200
         )
 
         draw.text(  # легенда > ускорение
             (100, 100),
-            'a = {a: .2f} м/сек^2'.format(a=obj.array_a[i]),
+            'a = {a: .2f} m/s^2'.format(a=obj.array_a[i]),
             fill=color_2,
-            font=font
+            fontsize=200
         )
 
         draw.text(  # легенда > скорость
             (100, 200),
-            'v = {v: .2f} м/сек'.format(v=obj.array_v[i]),
+            'v = {v: .2f} m/s'.format(v=obj.array_v[i]),
             fill=color_2,
-            font=font
+            fontsize=200
         )
 
         draw.text(  # легенда > модуль силы реакции опоры
             (100, 300),
-            'N = {weight: .2f} Н'.format(weight=obj.array_w[i]),
+            'N = {weight: .2f} H'.format(weight=obj.array_w[i]),
             fill=color_2,
-            font=font
+            fontsize=200
         )
 
         draw.text(  # легенда > время в движении
             (100, 400),
-            't = {t: .2f} сек'.format(t=obj.array_t[i]),
+            't = {t: .2f} c'.format(t=obj.array_t[i]),
             fill=color_2,
-            font=font
+            fontsize=200
         )
         frames.append(im)
 
     frames[0].save(
-        r'res/draw.gif',
+        r'draw.gif',
         save_all=True,
         append_images=frames[1:],
-        optimize=False,
-        duration=10,
+        optimize=True,
+        duration=75,  # different for linux and windows
         loop=0
     )
 
 
 def main():
-    draw_anim()
-    draw_graphics()
-    print(rf'all the graphs are located in {os.path.dirname(os.path.abspath(__file__))}\res')
+    cl = Object().go_up().go_up().go_down(2)
+    draw_anim(cl)
+    draw_graphics(cl)
+    print(f'time: {cl.array_t[-1]}')
+    print(rf'all the graphs are located in {os.path.dirname(os.path.abspath(__file__))}')
+
 
 if __name__ == '__main__':
     main()
+
+
